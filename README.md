@@ -1,122 +1,120 @@
-\# FISH IT / FishBot 🎣
+# PixelCast
 
+Two fishing macros that work off screen pixels instead of fixed timings. One's
+AutoHotkey, one's Python. The AHK one is the one I actually use.
 
+Both do the same thing: hold the cast until the charge bar hits the right
+colour, let go, then watch for the click prompt and click until it's gone.
+Watching for the prompt instead of clicking a set number of times is the whole
+point. The count is randomised, and the leftover clicks were re-casting my rod
+halfway through a reel.
 
-A lightweight, automated fishing macro featuring an AutoHotkey (AHK) GUI interface (`FishIt`) and an optional Python OpenCV alternative (`fishbot.py`).
+## Heads up
 
+Macros break the rules in most games and you can get banned for using one.
+That's on you, not me.
 
+## FishIt.ahk, the main one
 
-\---
+Needs [AutoHotkey v1.1](https://www.autohotkey.com/). Nothing else.
 
+Double-click the script and a small always-on-top window shows up with the
+stats and a key list. Then:
 
+1. Start a cast so the charge bar is on screen. Put your mouse on the bar at
+   the point where the cast is perfect and press F1.
+2. Get the reel prompt up. Hover the red stop button and press F2.
+3. Press F3 for the live monitor and fish one cycle by hand while you watch
+   the two readouts. If they don't light up at the right moments your pixels
+   are wrong, so redo F1 and F2.
+4. F8 to start.
 
-\## ⚠️ Disclaimer
+Calibration saves to `FishIt.ini` next to the script, so you only do it once
+per resolution. Delete the ini to start over.
 
+### Keys
 
+| Key | What it does |
+| --- | --- |
+| F1 | Set the cast pixel (hover first, then press) |
+| F2 | Set the reel pixel |
+| F3 | Live monitor on / off |
+| F6 / Shift+F6 | Cast tolerance up / down |
+| F7 / Shift+F7 | Reel tolerance up / down |
+| F8 | Start / pause |
+| F9 | Reset the stats |
+| Esc | Quit |
 
-\*\*This software is created for educational and personal research purposes only.\*\* Using automated scripts or macros in online games may violate the game's Terms of Service (ToS) and could lead to account penalties or bans. Use this software entirely at your own risk. The author assumes no liability for any actions taken against your account.
+### When it misfires
 
+Tolerance is how far off the colour is allowed to be and still count as a
+match. Mine sits at 45 for the cast and 60 for the reel.
 
+It never casts, or casts instantly: cast tolerance is too tight or too loose.
+F6 and Shift+F6 with the live monitor on.
 
-\---
+It keeps clicking after the fish is caught: reel tolerance is too loose and
+it's matching the background. Shift+F7, or pick a pixel whose colour isn't
+behind it.
 
+It worked yesterday and doesn't today: the UI moved. Different window size or
+resolution means calibrating again.
 
+Timing is at the top of the script if you want to change it. Clicks during a
+reel land between 85 and 145 ms apart, there's a 900 ms pause between cycles,
+and it gives up on a charge bar after 5 seconds.
 
-\## 📋 Prerequisites
+## fishbot.py
 
+Same idea, except it watches a box of pixels instead of one, so a single pixel
+drifting doesn't throw it. It takes longer to set up and I don't reach for it
+much.
 
+    pip install mss numpy pynput pydirectinput
 
-To run the main `FishIt` macro, you \*\*only need AutoHotkey\*\*. You do \*\*not\*\* need Python installed unless you plan to use `fishbot.py`.
+    python fishbot.py calibrate   # teach it the prompt
+    python fishbot.py test        # live readout, get this right before running
+    python fishbot.py run         # F2 start/stop, F4 quit
 
+Run the game borderless windowed. Exclusive fullscreen captures as a black
+frame and nothing is ever detected.
 
+Calibration takes two samples: F8 with the prompt on screen, F9 once it's gone
+with the mouse still in the same spot. It then picks whichever tolerance
+separates the two best. If it warns you the samples look too alike, believe it
+and aim at a part of the prompt whose colour isn't in the background.
 
-\* \*\*Download AutoHotkey:\*\* \[https://www.autohotkey.com/](https://www.autohotkey.com/)
+## record.py
 
-\* \*\*Video Guide:\*\* 🎥 \[How to Download \& Install AutoHotkey on Windows (YouTube)](https://www.youtube.com/watch?v=gerGVsv\_VAw)
+A setup helper, not part of the macro. It records a fishing cycle at 4 fps and
+zips the frames so you can scrub through them and read exact coordinates and
+colours off a still, instead of trying to hover the right pixel live. Frames
+are half size and sampled nearest-neighbour, so the colours in them are real
+captured colours rather than blends. Halve your screen coordinates to match.
 
+    pip install mss numpy pillow pynput
+    python record.py     # F8 start/stop, Esc quit
 
+## Known problems
 
-\---
+Single-pixel matching is brittle. Weather, time of day, or any UI element that
+slides over your pixel will break it until you recalibrate. That's why the
+Python one exists.
 
+Nothing here checks which window is focused. Alt-tab while it's running and it
+carries on clicking the same screen coordinates into whatever's in front.
 
+The Python one has no GUI and no stats, it just prints lines.
 
-\## 🛠 Features
+Coordinates are stored relative to the monitor the game is on, which it works
+out by looking for the Roblox window. If you're playing something else, change
+the ahk_exe line in MonOffset() or it falls back to whichever monitor your
+cursor happens to be on.
 
+Written for AutoHotkey v1. It works, so I'm leaving it there.
 
+Only tested on Windows, at my resolution.
 
-\* \*\*GUI Interface:\*\* Track state, runtime, cycles, caught/failed statistics, and fail streaks in real-time.
+## License
 
-\* \*\*Pixel Calibration:\*\* Set custom Cast and Reel pixels on the fly using hotkeys.
-
-\* \*\*Live Monitor:\*\* Toggleable color-tracking debug view.
-
-\* \*\*Tolerance Controls:\*\* Adjust color sensitivity dynamically to compensate for in-game lighting and shading changes.
-
-
-
-\---
-
-
-
-\## 🎮 Hotkey Controls
-
-
-
-| Key | Function |
-
-| :--- | :--- |
-
-| \*\*`F1`\*\* | Set \*\*CAST\*\* pixel (hover mouse over target, then press) |
-
-| \*\*`F2`\*\* | Set \*\*REEL\*\* pixel (hover mouse over target, then press) |
-
-| \*\*`F3`\*\* | Toggle \*\*Live Monitor\*\* ON / OFF |
-
-| \*\*`F6`\*\* | Increase CAST color tolerance |
-
-| \*\*`Shift + F6`\*\* | Decrease CAST color tolerance |
-
-| \*\*`F7`\*\* | Increase REEL color tolerance |
-
-| \*\*`Shift + F7`\*\* | Decrease REEL color tolerance |
-
-| \*\*`F8`\*\* | \*\*Start / Pause\*\* macro execution |
-
-| \*\*`F9`\*\* | Reset stats \& timers |
-
-| \*\*`ESC`\*\* | Exit program |
-
-
-
-\---
-
-
-
-\## 🚀 Quick Start Guide
-
-
-
-1\. Install \*\*AutoHotkey v1.1+\*\* on your Windows PC.
-
-2\. Double-click \*\*`FishIt.ahk`\*\* to launch the macro.
-
-3\. In your game, hover your mouse over the \*\*Cast\*\* pixel indicator and press \*\*`F1`\*\*.
-
-4\. Hover your mouse over the \*\*Reel\*\* pixel indicator and press \*\*`F2`\*\*.
-
-5\. Press \*\*`F3`\*\* to enable the Live Monitor and verify pixel detection.
-
-6\. Press \*\*`F8`\*\* to start auto-fishing.
-
-
-
-\---
-
-
-
-\## ⚖️ License
-
-
-
-Distributed under the \*\*MIT License\*\*. See `LICENSE` for details.
-
+MIT, see LICENSE.

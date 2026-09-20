@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-record.py - capture one manual fishing cycle so the pixels can be found
+record.py - record one fishing cycle so you can find your pixels off a still
 
-You fish ONE cycle by hand. This saves frames. You send me the zip.
-I find the exact coordinates and colours and hand you back a finished config.
+Fish a single cycle by hand with this running. It saves the frames and zips
+them. Open the zip, scrub to the frame where the charge bar is perfect, and
+read the coordinate and colour straight off it - much easier than trying to
+hover the right pixel while the bar is moving.
 
     pip install mss numpy pillow pynput
     python record.py
@@ -11,9 +13,10 @@ I find the exact coordinates and colours and hand you back a finished config.
     F8   start / stop recording
     ESC  quit
 
-Frames are half-size with nearest-neighbour sampling, so every pixel colour
-in them is a real captured colour, not a blend. Coordinates in the frames are
-exactly half your screen coordinates.
+Frames are half size, sampled nearest-neighbour, so every colour in them is a
+real captured colour and not a blend of its neighbours. Coordinates in a frame
+are exactly half your screen coordinates - double them before you put them in
+FishIt.ini.
 """
 
 import os
@@ -100,10 +103,7 @@ def main():
 
     mb = os.path.getsize(zpath) / 1e6
     print(f"\n\nSaved {n} frames -> {zpath}  ({mb:.1f} MB)")
-    print("Send me that zip.")
-    if mb > 30:
-        print("If it's too big to upload, delete some frames from the")
-        print("capture folder and re-zip, or record a shorter cycle.")
+    print("Open it and find the frame you want.")
 
 
 if __name__ == "__main__":
